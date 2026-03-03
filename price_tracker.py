@@ -3,6 +3,15 @@
 import yfinance as yf
 from datetime import datetime
 
+# Function to calculate Simple Moving Average (SMA)
+def calculate_sma(prices, period):
+    """
+    :param prices: a pandas Series of closing  prices
+    :param period: number of days to average (e.g., 20, 50, 200)
+    :return:
+    """
+    return prices.rolling(window=period).mean()
+
 
 # Print header
 print("Stock Price Tracker")
@@ -55,6 +64,19 @@ for ticker in tickers:
         'week_52_high': week_52_high,
         'week_52_low': week_52_low
     })
+
+    # Fetch 1 year of daily historical data
+    hist = stock.history(period="1y")
+    closes = hist['Close']  # pandas Series of closing prices
+
+    # Calculate SMAs
+    sma_20 = calculate_sma(closes, 20)
+    sma_50 = calculate_sma(closes, 50)
+
+    print("Simple Moving Average:")
+    # .iloc[-1] gets the most recent value
+    print(f"SMA(20): {sma_20.iloc[-1]:.2f}")
+    print(f"SMA(50): {sma_50.iloc[-1]:.2f}\n")
 
 
 # Print table header
