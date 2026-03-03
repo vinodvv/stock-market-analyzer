@@ -13,6 +13,17 @@ def calculate_sma(prices, period):
     return prices.rolling(window=period).mean()
 
 
+# Function to calculate Exponential Moving Average
+def calculate_ema(prices, period):
+    """
+    :param prices: a pandas Series of closing prices
+    :param period: number of days (e.g., 12, 26 are standard for MACD)
+    adjust=False means it uses the recursive EMA formula
+    :return:
+    """
+    return prices.ewm(span=period, adjust=False).mean()
+
+
 # Print header
 print("Stock Price Tracker")
 print("===================")
@@ -77,6 +88,14 @@ for ticker in tickers:
     # .iloc[-1] gets the most recent value
     print(f"SMA(20): {sma_20.iloc[-1]:.2f}")
     print(f"SMA(50): {sma_50.iloc[-1]:.2f}\n")
+
+    # Calculate EMAs
+    ema_12 = calculate_ema(closes, 12)
+    ema_26 = calculate_ema(closes, 26)
+
+    print("Exponential Moving Average")
+    print(f"EMA(12): {ema_12.iloc[-1]:.2f}")
+    print(f"EMA(26): {ema_26.iloc[-1]:.2f}\n")
 
 
 # Print table header
