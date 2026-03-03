@@ -24,6 +24,22 @@ def calculate_ema(prices, period):
     return prices.ewm(span=period, adjust=False).mean()
 
 
+# Function to calculate Moving Average Convergence Divergence
+def calculate_macd(prices):
+    """
+    :param prices: a pandas Series of closing prices
+    :return: macd_line, signal_line, histogram (all pandas Series)
+    """
+    ema_12 = calculate_ema(prices, 12)
+    ema_26 = calculate_ema(prices, 26)
+
+    macd_line = ema_12 - ema_26
+    signal_line = macd_line.ewm(span=9, adjust=False).mean()
+    histogram = macd_line - signal_line
+
+    return macd_line, signal_line, histogram
+
+
 # Print header
 print("Stock Price Tracker")
 print("===================")
@@ -97,6 +113,14 @@ for ticker in tickers:
     print(f"EMA(12): {ema_12.iloc[-1]:.2f}")
     print(f"EMA(26): {ema_26.iloc[-1]:.2f}\n")
 
+    # MACD get values
+    macd_line, signal_line, histogram = calculate_macd(closes)
+
+    print("Moving Average Convergence Divergence")
+    print(f"MACD line:    {macd_line.iloc[-1]:.4f}")
+    print(f"Signal line:  {signal_line.iloc[-1]:.4f}")
+    print(f"Histogram:    {histogram.iloc[-1]:.4f}\n")
+
 
 # Print table header
 print("Stock Market Data")
@@ -123,7 +147,7 @@ for stock in stocks_data:
         market_cap_str = "N/A"
 
     # Print row
-    print(f"{stock['ticker']:<17} {price_str:<12} {change_str:<11} {change_pct_str:<10} {volume_str:<14} {market_cap_str}")
+    print(f"{stock['ticker']:<17} {price_str:<12} {change_str:<12} {change_pct_str:<10} {volume_str:<14} {market_cap_str}")
 
 print("-" * 80)
 
