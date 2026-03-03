@@ -40,6 +40,27 @@ def calculate_macd(prices):
     return macd_line, signal_line, histogram
 
 
+# Function to calculate Relative Strength Index
+def calculate_rsi(prices, period=14):
+    """
+    :param prices: a pandas Series of closing prices
+    :param period: lookback period (14 is the universal standard)
+    :return:
+    """
+    delta = prices.diff()
+
+    gains = delta.where(delta > 0, 0)
+    losses = delta.where(delta < 0, 0)
+
+    avg_gain = gains.ewm(span=period, adjust=False).mean()
+    avg_loss = losses.ewm(span=period, adjust=False).mean()
+
+    rs = avg_gain / avg_loss
+    rsi = 100 - (100 / (1 + rs))
+
+    return rsi
+
+
 # Print header
 print("Stock Price Tracker")
 print("===================")
@@ -120,6 +141,21 @@ for ticker in tickers:
     print(f"MACD line:    {macd_line.iloc[-1]:.4f}")
     print(f"Signal line:  {signal_line.iloc[-1]:.4f}")
     print(f"Histogram:    {histogram.iloc[-1]:.4f}\n")
+
+    # Calculate and show RSI
+    print("Relative Strength Index")
+
+    rsi = calculate_rsi(closes)
+    rsi_value = rsi.iloc[-1]
+
+    print(f"RSI(14): {rsi_value:.2f}", end="  ")
+
+    if rsi_value >= 70:
+        print("⚠️ Overbought")
+    elif rsi_value <= 30:
+        print("🟢 Oversold")
+    else:
+        print("✅ Neutral\n")
 
 
 # Print table header
